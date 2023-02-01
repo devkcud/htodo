@@ -12,6 +12,8 @@ fn main() {
      * no;Hello, world 4!
      */
 
+    todo.clone().remove_todo(2);
+
     println!("{}", todo.clone().get_all_todos());
     println!("{}", todo.clone().get_single_todo(1)); // Expect 'Hello, world 1!'
     println!("{}", todo.clone().get_single_todo(99)); // Expect 'Hello, world 4!' -> wrapping up

@@ -1,4 +1,4 @@
-use std::{ fs::{OpenOptions, create_dir_all, read_to_string}, io::{ Error, prelude::* } };
+use std::{ fs::{OpenOptions, create_dir_all, read_to_string, File}, io::{ Error, prelude::* } };
 
 use dirs;
 use regex::Regex;
@@ -71,6 +71,20 @@ impl TodoFile {
         let mut file = self.open_as_obj(false).expect("Couldn't open todo file");
 
         writeln!(file, "{todo}").expect("Couldn't write todo file");
+    }
+
+    pub fn remove_todo(self, index: usize) {
+        let index = index.wrapping_sub(1).clamp(0, self.clone().read_to_string().lines().count() - 1);
+        let mut output = String::new();
+
+        for (i, line) in self.clone().read_to_string().lines().enumerate() {
+            if i != index {
+                output.push_str(&format!("{}\n", line));
+            }
+        }
+
+        let mut file = File::create(self.file_path).expect("Couldn't write todo file");
+        file.write_all(output.trim().as_bytes()).expect("Couldn't write todo file");
     }
 
     // TODO: remove_todo function
