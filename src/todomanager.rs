@@ -87,7 +87,25 @@ impl TodoFile {
         file.write_all(output.trim().as_bytes()).expect("Couldn't write todo file");
     }
 
-    // TODO: remove_todo function
+    pub fn toggle_todo(self, index: usize) {
+        let index = index.wrapping_sub(1).clamp(0, self.clone().read_to_string().lines().count() - 1);
+        let mut output = String::new();
+
+        for (i, line) in self.clone().read_to_string().lines().enumerate() {
+            if i == index {
+                if line.starts_with("no;") {
+                    output.push_str(&format!("ye;{}\n", &line[3..]));
+                } else {
+                    output.push_str(&format!("no;{}\n", &line[3..]));
+                }
+            } else {
+                output.push_str(&format!("{}\n", line));
+            }
+        }
+
+        let mut file = File::create(self.file_path).expect("Couldn't write todo file");
+        file.write_all(output.trim().as_bytes()).expect("Couldn't write todo file");
+    }
 
     fn open_as_obj(self, readonly: bool) -> Result<std::fs::File, Error> {
         if readonly {
