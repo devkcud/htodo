@@ -51,7 +51,7 @@ impl TodoFile {
         }
 
         return output.trim().to_string();
-    } 
+    }
 
     pub fn get_single_todo(self, index: usize) -> String {
         let index = index.wrapping_sub(1).clamp(0, self.clone().read_to_string().lines().count() - 1);
@@ -60,14 +60,13 @@ impl TodoFile {
         let strict = &s.lines().nth(index).expect("Index out of bounds")[3..];
 
         strict.to_string()
-        
     }
 
     pub fn add_todo(self, todo: &'static str) {
         // Template: <done?>;<todo>
         // 'ye;Do something' -> Done = true
         // 'no;Do something' -> Done = false
-        
+
         let todo = format!("no;{}", todo);
         let mut file = self.open_as_obj(false).expect("Couldn't open todo file");
 
