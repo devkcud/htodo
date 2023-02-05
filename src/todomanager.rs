@@ -1,7 +1,9 @@
-use std::{ fs::{OpenOptions, create_dir_all, read_to_string, File}, io::{ Error, prelude::* } };
+use std::{ fs::{ OpenOptions, create_dir_all, read_to_string, File }, io::{ Error, prelude::* } };
 
 use dirs;
+use prettytable::{ Table, row, format };
 use regex::Regex;
+use colored::Colorize;
 
 #[derive(Clone)]
 pub struct TodoFile {
@@ -43,14 +45,20 @@ impl TodoFile {
         TodoFile { file_path, category }
     }
 
-    pub fn get_all_todos(self) -> String {
-        let mut output = String::new();
+    pub fn get_all_todos(self) {
+        let mut table = Table::new();
 
-        for line in self.read_to_string().lines() {
-            output.push_str(&format!("{}\n", &line[3..]));
+        table.set_format(*format::consts::FORMAT_CLEAN);
+        table.add_row(row!["Index".bold().magenta(), "Todo".bold().magenta()]);
+
+        for (i, line) in self.clone().read_to_string().lines().enumerate() {
+            table.add_row(row![
+                (i + 1).to_string().yellow(),
+                if line.starts_with("ye;") { line[3..].dimmed().strikethrough().italic().to_string() } else { line[3..].to_string() }
+            ]);
         }
 
-        return output.trim().to_string();
+        table.printstd();
     }
 
     pub fn get_single_todo(self, index: usize) -> String {
@@ -63,10 +71,6 @@ impl TodoFile {
     }
 
     pub fn add_todo(self, todo: &'static str) {
-        // Template: <done?>;<todo>
-        // 'ye;Do something' -> Done = true
-        // 'no;Do something' -> Done = false
-
         let todo = format!("no;{}", todo);
         let mut file = self.open_as_obj(false).expect("Couldn't open todo file");
 
@@ -96,8 +100,8 @@ impl TodoFile {
                 if line.starts_with("no;") {
                     output.push_str(&format!("ye;{}\n", &line[3..]));
                 } else {
-                    output.push_str(&format!("no;{}\n", &line[3..]));
-                }
+                        output.push_str(&format!("no;{}\n", &line[3..]));
+                    }
             } else {
                 output.push_str(&format!("{}\n", line));
             }

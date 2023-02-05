@@ -14,4 +14,5 @@ fn main() {
 
     //todo.clone().remove_todo(2);
     todo.clone().toggle_todo(2);
+    todo.clone().get_all_todos();
 }
