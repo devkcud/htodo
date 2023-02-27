@@ -1,9 +1,7 @@
 use dirs;
-use std::{fs, io::prelude::*};
+use std::{fs, io::{prelude::*, self}};
 
-// TODO: Create better ways to handle errors (also remove unwraps and expects)
 // TODO: Add toggle_todo, get_all_todos functions
-// TODO: Remove derive(clone)
 
 #[derive(Clone)]
 pub struct TodoFile {
@@ -12,35 +10,38 @@ pub struct TodoFile {
 }
 
 impl TodoFile {
-    pub fn new(category: String) -> TodoFile {
+    pub fn new(category: String) -> Result<TodoFile, io::Error> {
         let folder = dirs::config_dir().unwrap().to_string_lossy().to_string();
 
         let todos_folder = format!("{}/htodo/todolists", folder);
-        fs::create_dir_all(&todos_folder).expect("Couldn't create config dir.");
-
         let file_path = format!("{}/{}.list", todos_folder, category);
-        fs::OpenOptions::new().write(true).create(true).open(&file_path).unwrap();
 
-        TodoFile { file_path, category }
+        fs::create_dir_all(&todos_folder)?;
+        fs::OpenOptions::new().write(true).create(true).open(&file_path)?;
+
+        Ok(TodoFile { file_path, category })
     }
 
-    pub fn add_todo(self, todo: &str) {
+    pub fn add_todo(self, todo: &str) -> Result<(), io::Error> {
         let todo = format!("no;{todo}");
-        let mut file = fs::OpenOptions::new().append(true).read(true).open(self.file_path).expect("Couldn't open file");
+        let mut file = fs::OpenOptions::new().append(true).open(self.file_path)?;
 
-        writeln!(file, "{todo}").expect("Couldn't write todo file");
+        writeln!(file, "{todo}")
     }
 
-    pub fn remove_todo(self, index: usize) {
-        let output = fs::read_to_string(&self.file_path).expect("Couldn't read file.");
+    pub fn remove_todo(self, index: usize) -> Result<(), io::Error> {
+        let output = fs::read_to_string(&self.file_path)?;
         let mut lines = output.lines().collect::<Vec<&str>>();
         lines.remove(index);
 
-        fs::write(self.file_path, lines.join("\n")).unwrap();
+        fs::write(self.file_path, lines.join("\n"))
     }
 
-    pub fn get_todo(self, index: usize) -> String {
-        fs::read_to_string(&self.file_path).unwrap().lines().nth(index).expect("Index out of bounds")[3..].to_string()
+    pub fn get_todo(self, index: usize) -> Option<String> {
+        let content = fs::read_to_string(self.file_path).ok()?;
+        let mut lines = content.lines();
+
+        lines.nth(index).map(|s| s.to_owned())
     }
 }
 
