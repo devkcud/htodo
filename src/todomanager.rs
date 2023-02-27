@@ -37,11 +37,25 @@ impl TodoFile {
         fs::write(self.file_path, lines.join("\n"))
     }
 
+    pub fn toggle_todo(self, index: usize) -> Result<(), io::Error> {
+        let file_content = fs::read_to_string(&self.file_path)?;
+
+        let new_content = if let Some(line) = file_content.lines().nth(index) {
+            let new_line = format!("{}{}", if line.starts_with("no;") { "ye;" } else { "no;" }, &line[3..]);
+            file_content.replacen(line, &new_line, 1)
+        } else {
+            file_content
+        };
+
+        fs::write(self.file_path, new_content)?;
+        Ok(())
+    }
+
     pub fn get_todo(self, index: usize) -> Option<String> {
         let content = fs::read_to_string(self.file_path).ok()?;
         let mut lines = content.lines();
 
-        lines.nth(index).map(|s| s.to_owned())
+        lines.nth(index).map(|s| s[3..].to_owned())
     }
 }
 
