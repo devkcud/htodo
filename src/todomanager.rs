@@ -1,9 +1,9 @@
-use std::{ fs::{ OpenOptions, create_dir_all, read_to_string, File }, io::{ Error, prelude::* } };
-
 use dirs;
-use prettytable::{ Table, row, format };
-use regex::Regex;
-use colored::Colorize;
+use std::{fs, io::prelude::*};
+
+// TODO: Create better ways to handle errors (also remove unwraps and expects)
+// TODO: Add toggle_todo, get_all_todos functions
+// TODO: Remove derive(clone)
 
 #[derive(Clone)]
 pub struct TodoFile {
@@ -11,116 +11,36 @@ pub struct TodoFile {
     category:  String,
 }
 
-// TODO: Create better ways to handle errors
-
 impl TodoFile {
     pub fn new(category: String) -> TodoFile {
-        let file_path = dirs::config_dir().unwrap();
-        let mut file_path = file_path.to_string_lossy().to_string();
+        let folder = dirs::config_dir().unwrap().to_string_lossy().to_string();
 
-        if !file_path.ends_with("/") && !file_path.ends_with("\\") {
-            file_path.push('/');
-        }
+        let todos_folder = format!("{}/htodo/todolists", folder);
+        fs::create_dir_all(&todos_folder).expect("Couldn't create config dir.");
 
-        file_path = format!("{}htodo/todolists/{}/", file_path, if !category.is_empty() { category.to_string() } else { ".".to_string() });
-
-        // TODO: Reduce the amount of regex
-        let mut re = Regex::new(r"(?i)/+").unwrap();
-        let normalized = re.replace_all(&file_path, "/");
-
-        re = Regex::new(r"/\./").unwrap();
-        let normalized = re.replace_all(&normalized, "/");
-
-        re = Regex::new(r"^\./").unwrap();
-        let normalized = re.replace_all(&normalized, "");
-
-        re = Regex::new(r"/[^/]+/\.\./").unwrap();
-        let normalized = re.replace_all(&normalized, "/").to_string();
-
-        create_dir_all(&normalized).expect("Couldn't create config dir.");
-
-        file_path = format!("{}todo.list", normalized);
-        OpenOptions::new().write(true).create(true).open(&file_path).unwrap();
+        let file_path = format!("{}/{}.list", todos_folder, category);
+        fs::OpenOptions::new().write(true).create(true).open(&file_path).unwrap();
 
         TodoFile { file_path, category }
     }
 
-    pub fn get_all_todos(self) {
-        let mut table = Table::new();
-
-        table.set_format(*format::consts::FORMAT_CLEAN);
-        table.add_row(row!["Index".bold().magenta(), "Todo".bold().magenta()]);
-
-        for (i, line) in self.clone().read_to_string().lines().enumerate() {
-            table.add_row(row![
-                (i + 1).to_string().yellow(),
-                if line.starts_with("ye;") { line[3..].dimmed().strikethrough().italic().to_string() } else { line[3..].to_string() }
-            ]);
-        }
-
-        table.printstd();
-    }
-
-    pub fn get_single_todo(self, index: usize) -> String {
-        let index = index.wrapping_sub(1).clamp(0, self.clone().read_to_string().lines().count() - 1);
-
-        let s = self.read_to_string();
-        let strict = &s.lines().nth(index).expect("Index out of bounds")[3..];
-
-        strict.to_string()
-    }
-
-    pub fn add_todo(self, todo: &'static str) {
-        let todo = format!("no;{}", todo);
-        let mut file = self.open_as_obj(false).expect("Couldn't open todo file");
+    pub fn add_todo(self, todo: &str) {
+        let todo = format!("no;{todo}");
+        let mut file = fs::OpenOptions::new().append(true).read(true).open(self.file_path).expect("Couldn't open file");
 
         writeln!(file, "{todo}").expect("Couldn't write todo file");
     }
 
     pub fn remove_todo(self, index: usize) {
-        let index = index.wrapping_sub(1).clamp(0, self.clone().read_to_string().lines().count() - 1);
-        let mut output = String::new();
+        let output = fs::read_to_string(&self.file_path).expect("Couldn't read file.");
+        let mut lines = output.lines().collect::<Vec<&str>>();
+        lines.remove(index);
 
-        for (i, line) in self.clone().read_to_string().lines().enumerate() {
-            if i != index {
-                output.push_str(&format!("{}\n", line));
-            }
-        }
-
-        let mut file = File::create(self.file_path).expect("Couldn't write todo file");
-        file.write_all(output.trim().as_bytes()).expect("Couldn't write todo file");
+        fs::write(self.file_path, lines.join("\n")).unwrap();
     }
 
-    pub fn toggle_todo(self, index: usize) {
-        let index = index.wrapping_sub(1).clamp(0, self.clone().read_to_string().lines().count() - 1);
-        let mut output = String::new();
-
-        for (i, line) in self.clone().read_to_string().lines().enumerate() {
-            if i == index {
-                if line.starts_with("no;") {
-                    output.push_str(&format!("ye;{}\n", &line[3..]));
-                } else {
-                        output.push_str(&format!("no;{}\n", &line[3..]));
-                    }
-            } else {
-                output.push_str(&format!("{}\n", line));
-            }
-        }
-
-        let mut file = File::create(self.file_path).expect("Couldn't write todo file");
-        file.write_all(output.trim().as_bytes()).expect("Couldn't write todo file");
-    }
-
-    fn open_as_obj(self, readonly: bool) -> Result<std::fs::File, Error> {
-        if readonly {
-            return OpenOptions::new().read(true).open(self.file_path);
-        }
-
-        OpenOptions::new().append(true).read(true).open(self.file_path)
-    }
-
-    fn read_to_string(self) -> String {
-        read_to_string(self.file_path).expect("Couldn't read todo file").trim().to_string()
+    pub fn get_todo(self, index: usize) -> String {
+        fs::read_to_string(&self.file_path).unwrap().lines().nth(index).expect("Index out of bounds")[3..].to_string()
     }
 }
 
