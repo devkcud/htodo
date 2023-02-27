@@ -1,8 +1,6 @@
 use dirs;
 use std::{fs, io::{prelude::*, self}};
 
-// TODO: Add toggle_todo, get_all_todos functions
-
 #[derive(Clone)]
 pub struct TodoFile {
     file_path: String,
