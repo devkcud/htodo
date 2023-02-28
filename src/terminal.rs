@@ -1,3 +1,5 @@
+use colored::Colorize;
+
 #[derive(Debug)]
 struct Command {
     name:        &'static str,
@@ -24,12 +26,23 @@ impl Terminal {
         Terminal { is_verbose }
     }
 
-    pub fn log(self, msg: &str) {
-        println!("{msg}");
-
+    pub fn log(&self, msg: &str) {
+        if self.is_verbose {
+            println!("{}  {} {msg}", "LOG".bold().green(), "~>".magenta());
+        }
     }
 
-    pub fn help_menu(self, command_name: &str) {
+    pub fn warn(&self, msg: &str) {
+        if self.is_verbose {
+            println!("{} {} {msg}", "WARN".bold().yellow(), "~>".magenta());
+        }
+    }
+
+    pub fn err(&self, msg: &str) {
+        println!("{}  {} {msg}", "ERR".bold().red(), "~>".magenta());
+    }
+
+    pub fn help_menu(&self, command_name: &str) {
         if !command_name.is_empty() {
             let command = COMMAND_LIST.into_iter().find(|c| c.name == command_name);
 
