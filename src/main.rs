@@ -10,22 +10,21 @@ fn main() {
     let mut flags = args.iter().filter(|x| x.starts_with('-')).collect::<Vec<&String>>().into_iter();
 
     let term = terminal::Terminal::new(flags.find(|a| a.trim() == "-V" || a.trim() == "--verbose").is_some());
-    term.log("Verbose mode active (-V || --verbose)");
+    term.warn("Verbose mode active (-V || --verbose)");
 
     commands.remove(0);
 
     (commands.len() == 0).then(|| {
         term.err("Too few arguments (<1)");
-        term.warn("Exited 1");
         term.help_menu(&String::new());
-        std::process::exit(1);
+        term.throw_err();
     });
 
     term.log("Verifying command");
 
     match commands.remove(0).trim() {
         "h" | "help" => term.help_menu(commands.get(0).unwrap_or(&&String::new())),
-        _ => term.help_menu(&String::new()),
+        _ => term.help_menu(""),
     }
 
     term.warn("Exited 0");

@@ -5,7 +5,7 @@ struct Command {
     name:        &'static str,
     description: &'static str,
     usage:       &'static str,
-    alias  :     &'static str,
+    alias:       &'static str,
 }
 
 const COMMAND_LIST: [Command; 1] = [
@@ -42,11 +42,16 @@ impl Terminal {
         println!("{}  {} {msg}", "ERR".bold().red(), "~>".magenta());
     }
 
+    pub fn throw_err(&self) {
+        println!("{}  {} Error threw; exited 1", "ERR".bold().red(), "~>".magenta());
+        std::process::exit(1);
+    }
+
     pub fn help_menu(&self, command_name: &str) {
         if !command_name.is_empty() {
             let command = COMMAND_LIST.into_iter().find(|c| c.name == command_name);
 
-            match command {
+            return match command {
                 Some(s) => {
                     println!("Usage: {} {}", s.name, s.usage);
                 },
