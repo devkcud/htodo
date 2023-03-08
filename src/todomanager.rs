@@ -1,7 +1,6 @@
 use dirs;
 use std::{fs, io::{prelude::*, self}};
 
-#[derive(Clone)]
 pub struct TodoFile {
     file_path: String,
     category:  String,
@@ -20,22 +19,22 @@ impl TodoFile {
         Ok(TodoFile { file_path, category })
     }
 
-    pub fn add_todo(self, todo: &str) -> Result<(), io::Error> {
+    pub fn add_todo(&self, todo: &str) -> Result<(), io::Error> {
         let todo = format!("no;{todo}");
-        let mut file = fs::OpenOptions::new().append(true).open(self.file_path)?;
+        let mut file = fs::OpenOptions::new().append(true).open(&self.file_path)?;
 
         writeln!(file, "{todo}")
     }
 
-    pub fn remove_todo(self, index: usize) -> Result<(), io::Error> {
+    pub fn remove_todo(&self, index: usize) -> Result<(), io::Error> {
         let output = fs::read_to_string(&self.file_path)?;
         let mut lines = output.lines().collect::<Vec<&str>>();
         lines.remove(index);
 
-        fs::write(self.file_path, lines.join("\n"))
+        fs::write(&self.file_path, lines.join("\n"))
     }
 
-    pub fn toggle_todo(self, index: usize) -> Result<(), io::Error> {
+    pub fn toggle_todo(&self, index: usize) -> Result<(), io::Error> {
         let file_content = fs::read_to_string(&self.file_path)?;
 
         let new_content = if let Some(line) = file_content.lines().nth(index) {
@@ -45,15 +44,19 @@ impl TodoFile {
             file_content
         };
 
-        fs::write(self.file_path, new_content)?;
+        fs::write(&self.file_path, new_content)?;
         Ok(())
     }
 
-    pub fn get_todo(self, index: usize) -> Option<String> {
-        let content = fs::read_to_string(self.file_path).ok()?;
+    pub fn get_todo(&self, index: usize) -> Option<String> {
+        let content = fs::read_to_string(&self.file_path).ok()?;
         let mut lines = content.lines();
 
         lines.nth(index).map(|s| s[3..].to_owned())
+    }
+
+    pub fn get_file_path(&self) -> &String {
+        &self.file_path
     }
 }
 

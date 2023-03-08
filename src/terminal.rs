@@ -8,18 +8,38 @@ struct Command {
     alias:       &'static str,
 }
 
-const COMMAND_LIST: [Command; 1] = [
+const COMMAND_LIST: [Command; 4] = [
     Command {
         name:        "help",
         description: "Show the help menu or help for a specific command",
         usage:       "[command name]",
         alias:       "h",
-    }
+    },
+    Command {
+        name:        "add",
+        description: "Add a todo to the list",
+        usage:       "<command name>",
+        alias:       "a",
+    },
+    Command {
+        name:        "remove",
+        description: "Remove a todo to the list",
+        usage:       "<todo index>",
+        alias:       "r",
+    },
+    Command {
+        name:        "toggle",
+        description: "Toggle a todo on the list",
+        usage:       "<todo index>",
+        alias:       "t",
+    },
 ];
 
 pub struct Terminal {
     is_verbose: bool,
 }
+
+const SEPARATOR: &str = " * ";
 
 impl Terminal {
     pub fn new(is_verbose: bool) -> Terminal {
@@ -28,23 +48,24 @@ impl Terminal {
 
     pub fn log(&self, msg: &str) {
         if self.is_verbose {
-            println!("{}  {} {msg}", "LOG".bold().green(), "~>".magenta());
+            println!("{}  {}{msg}", "LOG".bold().green(), SEPARATOR.magenta());
         }
     }
 
     pub fn warn(&self, msg: &str) {
         if self.is_verbose {
-            println!("{} {} {msg}", "WARN".bold().yellow(), "~>".magenta());
+            println!("{} {}{msg}", "WARN".bold().yellow(), SEPARATOR.magenta());
         }
     }
 
     pub fn err(&self, msg: &str) {
-        println!("{}  {} {msg}", "ERR".bold().red(), "~>".magenta());
+        println!("{}{}{msg}", "ERROR".bold().red(), SEPARATOR.magenta());
     }
 
-    pub fn throw_err(&self) {
-        println!("{}  {} Error threw; exited 1", "ERR".bold().red(), "~>".magenta());
-        std::process::exit(1);
+    pub fn dev(&self, msg: &str) {
+        if self.is_verbose {
+            println!("{}{}{msg}", "D_ERR".dimmed(), SEPARATOR.magenta());
+        }
     }
 
     pub fn help_menu(&self, command_name: &str) {
