@@ -82,7 +82,12 @@ fn main() {
     let arg1 = commands.get(2);
 
     match command {
-        "h" | "help" => help::help_menu(arg1.unwrap_or(&&String::new())),
+        "h" | "help" => {
+            help::help_menu(arg1.unwrap_or(&&String::new()));
+
+            term.warn("Exited 0");
+            std::process::exit(0);
+        }
 
         "a" | "add" => {
             check_arg_len(2);
@@ -202,9 +207,15 @@ fn main() {
                     std::process::exit(1);
                 },
             }
+
+            term.warn("Exited 0");
+            std::process::exit(0);
         }
 
-        _ => help::help_menu(command),
+        _ => {
+            help::help_menu(command);
+            std::process::exit(1);
+        }
     }
 
     utils::show_todo_list(&fs::read_to_string(todo.get_file_path()).unwrap(), &term, &category, false, false);
