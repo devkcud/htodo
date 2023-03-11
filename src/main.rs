@@ -6,6 +6,9 @@ use prettytable::{self, Table, format, row};
 mod todomanager;
 
 #[allow(dead_code)]
+mod help;
+
+#[allow(dead_code)]
 mod terminal;
 
 fn main() {
@@ -102,7 +105,7 @@ fn main() {
     let arg1 = commands.get(2);
 
     match command {
-        "h" | "help" => term.help_menu(arg1.unwrap_or(&&String::new())),
+        "h" | "help" => help::help_menu(arg1.unwrap_or(&&String::new())),
 
         "a" | "add" => {
             check_arg_len(2);
@@ -224,7 +227,7 @@ fn main() {
             }
         }
 
-        _ => term.help_menu(command),
+        _ => help::help_menu(command),
     }
 
     term.warn("Exited 0");
