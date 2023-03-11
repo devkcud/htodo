@@ -1,12 +1,14 @@
-use std::{fs, ops::Sub};
+use std::fs;
 use colored::Colorize;
-use prettytable::{self, Table, format, row};
 
 #[allow(dead_code)]
 mod todomanager;
 
 #[allow(dead_code)]
 mod help;
+
+#[allow(dead_code)]
+mod utils;
 
 #[allow(dead_code)]
 mod terminal;
@@ -70,57 +72,7 @@ fn main() {
 
         let todos = fs::read_to_string(todo.get_file_path()).unwrap();
 
-        if todos.lines().count() == 0 {
-            term.err("Nothing to show. File is empty");
-
-            term.warn("Exited 0");
-            std::process::exit(0);
-        }
-
-        println!("{} {}\n", "SELECTED CATEGORY:".yellow().bold(), category.to_string());
-
-        let mut table = Table::new();
-        table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
-
-        table.set_titles(row!["", "TASK".yellow().bold(), "STATUS".yellow().bold()]);
-
-        let mut quantity_done = 0;
-
-        'readloop: for (mut i, t) in todos.lines().enumerate() {
-            i += 1;
-
-            let prefix = &t[..3];
-            let content = &t[3..];
-
-            match prefix {
-                "ye;" => {
-                    if show_only_todo { continue 'readloop; }
-
-                    table.add_row(row![i.to_string().yellow().bold(), content.magenta().dimmed().italic().strikethrough(), "Done".green()]);
-                    quantity_done += 1;
-                },
-                "no;" => {
-                    if show_only_done { continue 'readloop; }
-
-                    table.add_row(row![i.to_string().yellow().bold(), content.magenta(), "Todo".blue()]);
-                },
-                _ => (),
-            }
-        };
-
-        table.printstd();
-
-        let total_shown = table.to_string().lines().count().sub(2);
-
-        if !show_only_todo && !show_only_done {
-            println!("\n{} {}/{}",
-                "SIZE:".yellow().bold(),
-                if quantity_done == total_shown { quantity_done.to_string().green() } else { quantity_done.to_string().red() },
-                total_shown.to_string().green()
-            );
-        } else {
-            println!("\n{} {}", "SIZE:".yellow().bold(), total_shown);
-        }
+        utils::show_todo_list(&todos, &term, &category, show_only_todo, show_only_done);
 
         term.warn("Exited 0");
         std::process::exit(0);
@@ -254,6 +206,8 @@ fn main() {
 
         _ => help::help_menu(command),
     }
+
+    utils::show_todo_list(&fs::read_to_string(todo.get_file_path()).unwrap(), &term, &category, false, false);
 
     term.warn("Exited 0");
 }
