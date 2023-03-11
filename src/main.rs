@@ -138,6 +138,7 @@ fn main() {
                 std::process::exit(1);
             }
 
+            term.warn("Clamping index value to match the correct file size");
             index = index.clamp(1, file_content.lines().count());
 
             match todo.remove_todo(index.wrapping_sub(1)) {
@@ -172,6 +173,7 @@ fn main() {
                 std::process::exit(1);
             }
 
+            term.warn("Clamping index value to match the correct file size");
             index = index.clamp(1, file_content.lines().count());
 
             match todo.toggle_todo(index.wrapping_sub(1)) {
@@ -180,6 +182,42 @@ fn main() {
                 },
                 Err(_) => {
                     term.err(&format!("Couldn't toggle index {}", index));
+                    term.dev("Error has been found; exit 1");
+                    std::process::exit(1);
+                },
+            }
+        }
+
+        "g" | "get" => {
+            check_arg_len(2);
+
+            let mut index = match arg1.unwrap().parse::<usize>() {
+                Ok(o) => o,
+                Err(_) => {
+                    term.err(&format!("Couldn't parse {} to integer.", arg1.unwrap().red()));
+                    term.dev("Error has been found; exit 1");
+                    std::process::exit(1);
+                },
+            };
+
+            let file_content = fs::read_to_string(todo.get_file_path()).unwrap();
+
+            if file_content.lines().count() == 0 {
+                term.err("File is empty");
+                term.dev("Error has been found; exit 1");
+                std::process::exit(1);
+            }
+
+            term.warn("Clamping index value to match the correct file size");
+            index = index.clamp(1, file_content.lines().count());
+
+            match todo.get_todo(index.wrapping_sub(1)) {
+                Some(o) => {
+                    term.log(&format!("Got index {} from todo file", index));
+                    println!("{}", o);
+                },
+                None => {
+                    term.err(&format!("Couldn't get index {}", index));
                     term.dev("Error has been found; exit 1");
                     std::process::exit(1);
                 },

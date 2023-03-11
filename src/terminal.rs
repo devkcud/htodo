@@ -8,7 +8,7 @@ struct Command {
     alias:       &'static str,
 }
 
-const COMMAND_LIST: [Command; 4] = [
+const COMMAND_LIST: [Command; 5] = [
     Command {
         name:        "help",
         description: "Show the help menu or help for a specific command",
@@ -32,6 +32,12 @@ const COMMAND_LIST: [Command; 4] = [
         description: "Toggle a todo on the list",
         usage:       "<todo index>",
         alias:       "t",
+    },
+    Command {
+        name:        "get",
+        description: "Get a todo on the list",
+        usage:       "<todo index>",
+        alias:       "g",
     },
 ];
 
