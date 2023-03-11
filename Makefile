@@ -10,4 +10,5 @@ compile:
 clean:
 	-cargo clean
 	-rm -rf ${BUILD_DIR}
+	-rm -rf ~/.config/htodo/
 
