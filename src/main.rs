@@ -1,9 +1,14 @@
-use std::{fs, ops::Sub};
+use std::fs;
 use colored::Colorize;
-use prettytable::{self, Table, format, row};
 
 #[allow(dead_code)]
 mod todomanager;
+
+#[allow(dead_code)]
+mod help;
+
+#[allow(dead_code)]
+mod utils;
 
 #[allow(dead_code)]
 mod terminal;
@@ -24,9 +29,32 @@ fn main() {
         });
     };
 
+    let mut category = String::from("General");
+
+    match args.iter().find(|x| x.trim().starts_with("-c") || x.trim().starts_with("--category")) {
+        Some(s) => {
+            if s.find("=").is_none() {
+                term.warn("No category found after -c or --category; Skipping");
+            } else {
+                let text = s.split("=").collect::<Vec<&str>>()[1];
+
+                if text.trim() != "" {
+                    let normalized = regex::Regex::new(r"[^0-9a-zA-Z]").unwrap().replace_all(text, "");
+                    category = normalized.to_string();
+                    term.log(&format!("Using category {}", category));
+                } else {
+                    term.warn("No category found after -c= or --category=; Skipping");
+                }
+            }
+        }
+
+        None => {
+            term.log("No category found; Using default General");
+        },
+    }
 
     term.log("Initializing htodo configuration files");
-    let todo = match todomanager::TodoFile::new(String::from("General")) {
+    let todo = match todomanager::TodoFile::new(String::from(&category)) {
         Ok(o) => o,
         _ => {
             term.err("Couldn't init required config dir/files");
@@ -36,6 +64,7 @@ fn main() {
     };
 
     term.log(&format!("Configuration file created/found at {}", todo.get_file_path().underline()));
+    term.log("Verifying command");
 
     if commands.len() == 1 {
         let show_only_done = flags.iter().find(|a| a.trim() == "-y" || a.trim() == "--o-done").is_some();
@@ -43,66 +72,22 @@ fn main() {
 
         let todos = fs::read_to_string(todo.get_file_path()).unwrap();
 
-        if todos.lines().count() == 0 {
-            term.err("Nothing to show. File is empty");
-
-            term.warn("Exited 0");
-            std::process::exit(0);
-        }
-
-        let mut table = Table::new();
-        table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
-
-        table.set_titles(row!["", "TASK".yellow().bold(), "STATUS".yellow().bold()]);
-
-        let mut quantity_done = 0;
-
-        'readloop: for (mut i, t) in todos.lines().enumerate() {
-            i += 1;
-
-            let prefix = &t[..3];
-            let content = &t[3..];
-
-            match prefix {
-                "ye;" => {
-                    if show_only_todo { continue 'readloop; }
-
-                    table.add_row(row![i.to_string().yellow().bold(), content.magenta().dimmed().italic().strikethrough(), "Done".green()]);
-                    quantity_done += 1;
-                },
-                "no;" => {
-                    if show_only_done { continue 'readloop; }
-
-                    table.add_row(row![i.to_string().yellow().bold(), content.magenta(), "Todo".blue()]);
-                },
-                _ => (),
-            }
-        };
-
-        table.printstd();
-        let total_shown = table.to_string().lines().count().sub(2);
-
-        if !show_only_todo && !show_only_done {
-            println!("\n{} {}/{}",
-                "SIZE:".yellow().bold(),
-                if quantity_done == total_shown { quantity_done.to_string().green() } else { quantity_done.to_string().red() },
-                total_shown.to_string().green()
-            );
-        } else {
-            println!("\n{} {}", "SIZE:".yellow().bold(), total_shown);
-        }
+        utils::show_todo_list(&todos, &term, &category, show_only_todo, show_only_done);
 
         term.warn("Exited 0");
         std::process::exit(0);
     }
 
-    term.log("Verifying command");
-
     let command = commands.get(1).unwrap().trim();
     let arg1 = commands.get(2);
 
     match command {
-        "h" | "help" => term.help_menu(arg1.unwrap_or(&&String::new())),
+        "h" | "help" => {
+            help::help_menu(arg1.unwrap_or(&&String::new()));
+
+            term.warn("Exited 0");
+            std::process::exit(0);
+        }
 
         "a" | "add" => {
             check_arg_len(2);
@@ -222,10 +207,18 @@ fn main() {
                     std::process::exit(1);
                 },
             }
+
+            term.warn("Exited 0");
+            std::process::exit(0);
         }
 
-        _ => term.help_menu(command),
+        _ => {
+            help::help_menu(command);
+            std::process::exit(1);
+        }
     }
+
+    utils::show_todo_list(&fs::read_to_string(todo.get_file_path()).unwrap(), &term, &category, false, false);
 
     term.warn("Exited 0");
 }
