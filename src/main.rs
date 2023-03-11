@@ -27,9 +27,32 @@ fn main() {
         });
     };
 
+    let mut category = String::from("General");
+
+    match args.iter().find(|x| x.trim().starts_with("-c") || x.trim().starts_with("--category")) {
+        Some(s) => {
+            if s.find("=").is_none() {
+                term.warn("No category found after -c or --category; Skipping");
+            } else {
+                let text = s.split("=").collect::<Vec<&str>>()[1];
+
+                if text.trim() != "" {
+                    let normalized = regex::Regex::new(r"[^0-9a-zA-Z]").unwrap().replace_all(text, "");
+                    category = normalized.to_string();
+                    term.log(&format!("Using category {}", category));
+                } else {
+                    term.warn("No category found after -c= or --category=; Skipping");
+                }
+            }
+        }
+
+        None => {
+            term.log("No category found; Using default General");
+        },
+    }
 
     term.log("Initializing htodo configuration files");
-    let todo = match todomanager::TodoFile::new(String::from("General")) {
+    let todo = match todomanager::TodoFile::new(String::from(&category)) {
         Ok(o) => o,
         _ => {
             term.err("Couldn't init required config dir/files");
@@ -39,6 +62,7 @@ fn main() {
     };
 
     term.log(&format!("Configuration file created/found at {}", todo.get_file_path().underline()));
+    term.log("Verifying command");
 
     if commands.len() == 1 {
         let show_only_done = flags.iter().find(|a| a.trim() == "-y" || a.trim() == "--o-done").is_some();
@@ -52,6 +76,8 @@ fn main() {
             term.warn("Exited 0");
             std::process::exit(0);
         }
+
+        println!("{} {}\n", "SELECTED CATEGORY:".yellow().bold(), category.to_string());
 
         let mut table = Table::new();
         table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
@@ -83,6 +109,7 @@ fn main() {
         };
 
         table.printstd();
+
         let total_shown = table.to_string().lines().count().sub(2);
 
         if !show_only_todo && !show_only_done {
@@ -98,8 +125,6 @@ fn main() {
         term.warn("Exited 0");
         std::process::exit(0);
     }
-
-    term.log("Verifying command");
 
     let command = commands.get(1).unwrap().trim();
     let arg1 = commands.get(2);
