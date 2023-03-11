@@ -4,7 +4,7 @@ pub struct Terminal {
     is_verbose: bool,
 }
 
-const SEPARATOR: &str = " * ";
+pub const SEPARATOR: &str = " * ";
 
 impl Terminal {
     pub fn new(is_verbose: bool) -> Terminal {
