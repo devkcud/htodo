@@ -215,6 +215,12 @@ fn main() {
             std::process::exit(0);
         }
 
+        "i" | "interactive" => {
+            let shell = interactive::Shell::new(&category);
+            shell.launch();
+            std::process::exit(0);
+        }
+
         _ => {
             help::help_menu(command);
             std::process::exit(1);
