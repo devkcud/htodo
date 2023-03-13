@@ -27,7 +27,7 @@ const COMMAND_LIST: [Command; 5] = [
     },
     Command {
         name:        "add",
-        description: "Add a todo to the list",
+        description: "Add a todo to the list (or create a new todo file)",
         usage:       "<command name>",
         alias:       "a",
     },
@@ -51,7 +51,7 @@ const COMMAND_LIST: [Command; 5] = [
     },
 ];
 
-const FLAG_LIST: [Flag; 3] = [
+const FLAG_LIST: [Flag; 4] = [
     Flag {
         name:        "o-done",
         description: "Only show done tasks",
@@ -70,9 +70,15 @@ const FLAG_LIST: [Flag; 3] = [
         usage:       "",
         alias:       "V",
     },
+    Flag {
+        name:        "category",
+        description: "Define the category",
+        usage:       "\"<category-name>\"",
+        alias:       "c",
+    },
 ];
 
-const EXAMPLES: [&str; 11] = [
+const EXAMPLES: [&str; 12] = [
     "toggle 2",
     "toggle 3 -V",
     "toggle 5",
@@ -84,6 +90,7 @@ const EXAMPLES: [&str; 11] = [
     "-n",
     "--o-done",
     "--verbose",
+    "add \"Hello, world!\" -c=\"Test\"",
 ];
 
 pub fn help_menu(command_name: &str) {
