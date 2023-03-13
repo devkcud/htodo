@@ -13,10 +13,16 @@ mod utils;
 #[allow(dead_code)]
 mod terminal;
 
+#[allow(dead_code)]
+mod interactive;
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let commands: Vec<&String> = args.iter().filter(|x| !x.starts_with('-')).collect();
     let flags = args.iter().filter(|x| x.starts_with('-')).collect::<Vec<&String>>();
+
+    let show_only_done = flags.iter().find(|a| a.trim() == "-y" || a.trim() == "--o-done").is_some();
+    let show_only_todo = flags.iter().find(|a| a.trim() == "-n" || a.trim() == "--o-todo").is_some();
 
     let term = terminal::Terminal::new(flags.iter().find(|a| a.trim() == "-V" || a.trim() == "--verbose").is_some());
     term.warn("Verbose mode active (-V || --verbose)");
@@ -67,12 +73,9 @@ fn main() {
     term.log("Verifying command");
 
     if commands.len() == 1 {
-        let show_only_done = flags.iter().find(|a| a.trim() == "-y" || a.trim() == "--o-done").is_some();
-        let show_only_todo = flags.iter().find(|a| a.trim() == "-n" || a.trim() == "--o-todo").is_some();
-
         let todos = fs::read_to_string(todo.get_file_path()).unwrap();
 
-        utils::show_todo_list(&todos, &term, &category, show_only_todo, show_only_done);
+        utils::show_todo_list(&todos, &term, &category, show_only_done, show_only_todo);
 
         term.warn("Exited 0");
         std::process::exit(0);
@@ -218,7 +221,7 @@ fn main() {
         }
     }
 
-    utils::show_todo_list(&fs::read_to_string(todo.get_file_path()).unwrap(), &term, &category, false, false);
+    utils::show_todo_list(&fs::read_to_string(todo.get_file_path()).unwrap(), &term, &category, show_only_done, show_only_todo);
 
     term.warn("Exited 0");
 }
