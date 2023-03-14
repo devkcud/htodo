@@ -13,9 +13,6 @@ mod utils;
 #[allow(dead_code)]
 mod terminal;
 
-#[allow(dead_code)]
-mod interactive;
-
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let commands: Vec<&String> = args.iter().filter(|x| !x.starts_with('-')).collect();
@@ -212,12 +209,6 @@ fn main() {
             }
 
             term.warn("Exited 0");
-            std::process::exit(0);
-        }
-
-        "i" | "interactive" => {
-            let shell = interactive::Shell::new(&category);
-            shell.launch();
             std::process::exit(0);
         }
 
