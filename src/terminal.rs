@@ -1,4 +1,5 @@
 use colored::Colorize;
+use rustyline::DefaultEditor;
 
 pub struct Terminal {
     is_verbose: bool,
@@ -25,6 +26,28 @@ impl Terminal {
 
     pub fn err(&self, msg: &str) {
         println!("{}{}{msg}", "ERROR".bold().red(), SEPARATOR.magenta());
+    }
+
+    pub fn question(&self, msg: &str) -> String {
+        let mut rl = DefaultEditor::new().unwrap();
+        let answer = rl.readline(&format!("{}    {}{msg}", "?".bold().blue(), SEPARATOR.magenta()));
+        match answer {
+            Ok(o) => o,
+
+            Err(rustyline::error::ReadlineError::Interrupted) => {
+                println!("{}{}CTRL-C", "ERROR".bold().red(), SEPARATOR.magenta());
+                return String::new();
+            }
+            Err(rustyline::error::ReadlineError::Eof) => {
+                println!("{}{}CTRL-D", "ERROR".bold().red(), SEPARATOR.magenta());
+                return String::new();
+            }
+            Err(err) => {
+                println!("{}{}{err}", "ERROR".bold().red(), SEPARATOR.magenta());
+                std::process::exit(1);
+            }
+        }
+
     }
 
     pub fn dev(&self, msg: &str) {

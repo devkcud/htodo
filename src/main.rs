@@ -212,6 +212,27 @@ fn main() {
             std::process::exit(0);
         }
 
+        "c" | "clear" => {
+            term.warn(&format!("Removing {}", todo.get_file_path().green()));
+
+            let mut answer = term.question("Are you sure? [y/N] ").to_lowercase();
+            if answer.trim() == "" { answer = String::from("n"); }
+
+            let answer = answer.trim();
+
+            term.log(&format!("Got answer: {}", answer));
+
+            if answer == "y" {
+                fs::remove_file(todo.get_file_path()).unwrap();
+                term.warn(&format!("Removed {}", todo.get_file_path().green()));
+            } else {
+                term.err("Aborting...");
+            }
+
+            term.warn("Exited 0");
+            std::process::exit(0);
+        }
+
         _ => {
             help::help_menu(command);
             std::process::exit(1);
