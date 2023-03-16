@@ -215,7 +215,7 @@ fn main() {
         "c" | "clear" => {
             term.warn(&format!("Removing {}", todo.get_file_path().green()));
 
-            let mut answer = term.question("Are you sure? [y/N] ").to_lowercase();
+            let mut answer = term.question(&format!("Deleting '{}'. Are you sure? {} ", todo.get_file_path().green(), "y/N".yellow())).to_lowercase();
             if answer.trim() == "" { answer = String::from("n"); }
 
             let answer = answer.trim();

@@ -14,13 +14,13 @@ impl Terminal {
 
     pub fn log(&self, msg: &str) {
         if self.is_verbose {
-            println!("{}  {}{msg}", "LOG".bold().green(), SEPARATOR.magenta());
+            println!("  {}{}{msg}", "LOG".bold().green(), SEPARATOR.magenta());
         }
     }
 
     pub fn warn(&self, msg: &str) {
         if self.is_verbose {
-            println!("{} {}{msg}", "WARN".bold().yellow(), SEPARATOR.magenta());
+            println!(" {}{}{msg}", "WARN".bold().yellow(), SEPARATOR.magenta());
         }
     }
 
@@ -30,7 +30,7 @@ impl Terminal {
 
     pub fn question(&self, msg: &str) -> String {
         let mut rl = DefaultEditor::new().unwrap();
-        let answer = rl.readline(&format!("{}    {}{msg}", "?".bold().blue(), SEPARATOR.magenta()));
+        let answer = rl.readline(&format!("    {}{}{msg}", "?".bold().blue(), SEPARATOR.magenta()));
         match answer {
             Ok(o) => o,
 
