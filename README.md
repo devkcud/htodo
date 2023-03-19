@@ -28,8 +28,14 @@
 
 To _build_ you can use a simple `make` or `cargo build --release`:
 
-```
+Using `make`:
+
+```bash
 make compile
+```
+
+```bash
+cargo build --release
 ```
 
 ## Installing
@@ -38,7 +44,7 @@ make compile
 
 To _install_ you can use:
 
-```
+```bash
 make install
 ```
 
@@ -48,7 +54,7 @@ make install
 
 For now, use:
 
-```
+```bash
 make
 ./build/htodo help
 ```
