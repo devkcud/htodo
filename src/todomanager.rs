@@ -2,8 +2,10 @@ use dirs;
 use std::{fs, io::{prelude::*, self}};
 
 pub struct TodoFile {
-    file_path: String,
-    category:  String,
+    file_path:    String,
+    category:     String,
+
+    pub todos_folder: String,
 }
 
 impl TodoFile {
@@ -16,7 +18,7 @@ impl TodoFile {
         fs::create_dir_all(&todos_folder)?;
         fs::OpenOptions::new().write(true).create(true).open(&file_path)?;
 
-        Ok(TodoFile { file_path, category })
+        Ok(TodoFile { todos_folder, file_path, category })
     }
 
     pub fn add_todo(&self, todo: &str) -> Result<(), io::Error> {

@@ -212,7 +212,7 @@ fn main() {
             std::process::exit(0);
         }
 
-        "c" | "clear" => {
+        "clear" => {
             term.warn(&format!("Removing {}", todo.get_file_path().green()));
 
             let mut answer = term.question(&format!("Deleting '{}'. Are you sure? {} ", todo.get_file_path().green(), "y/N".yellow())).to_lowercase();
@@ -228,6 +228,22 @@ fn main() {
             } else {
                 term.err("Aborting...");
             }
+
+            term.warn("Exited 0");
+            std::process::exit(0);
+        }
+
+        "c" | "categories" => {
+            let mut files: Vec<String> = vec![];
+
+            for file in fs::read_dir(&todo.todos_folder).unwrap() {
+                let file = file.unwrap().path().display().to_string();
+                files.push(file.split("/").last().unwrap().replace(".list", "").blue().to_string());
+            }
+
+            files.sort();
+
+            println!("{} (case-sensitive)\n> {}", "CATEGORIES:".yellow().bold(), files.join("\n> "));
 
             term.warn("Exited 0");
             std::process::exit(0);
