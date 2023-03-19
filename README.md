@@ -10,16 +10,16 @@ It offers a simple and intuitive interaction that allows you to manage todos in 
 
 ## Features/Todo
 
-[x] - Help menu;
-[x] - Add tasks;
-[x] - Remove tasks;
-[x] - Read tasks;
-[ ] - Update tasks:
-[x] - Create categories;
-[x] - Clear categories;
-[x] - View categories;
-[x] - Check task as done (vice-versa);
-[ ] - readable/clean code lmao
+- [x] Help menu;
+- [x] Add tasks;
+- [x] Remove tasks;
+- [x] Read tasks;
+- [ ] Update tasks:
+- [x] Create categories;
+- [x] Clear categories;
+- [x] View categories;
+- [x] Check task as done (vice-versa);
+- [ ] readable/clean code lmao
 
 ## Requirements
 
