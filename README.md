@@ -2,8 +2,7 @@
 
 ## About
 
-**htodo** is a simple and efficient way to manage tasks via the terminal/command line.  
-It offers a simple and intuitive interaction that allows you to manage todos in different categories.
+**htodo** is a simple and efficient way to manage tasks via the terminal/command line. It offers a simple and intuitive interaction that allows you to manage todos in different categories.
 
 > Only tested on Linux using ZSH and BASH  
 > it's also a school project (maybe)
