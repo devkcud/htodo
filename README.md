@@ -32,16 +32,6 @@ To _build_ you can use a simple `make` or `cargo build --release`:
 make compile
 ```
 
-## Installing
-
-**NOT RECOMMENDED due to the script's "debug nature" (may be removed sometime)**
-
-To _install_ you can use:
-
-```bash
-make install
-```
-
 ## Usage
 
 **TODO**
