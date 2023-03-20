@@ -50,6 +50,29 @@ impl TodoFile {
         Ok(())
     }
 
+    pub fn edit_todo(&self, index: usize, new_todo: String) -> Result<(), io::Error> {
+        let file_content = fs::read_to_string(&self.file_path)?;
+
+        /*
+        let new_content = if let Some(line) = file_content.lines().nth(index) {
+            println!("{}", file_content.replacen(line, &format!("{}{}", &line[..2], new_todo), 1));
+            file_content.replacen(line, &format!("{}{}", &line[..2], new_todo), 1)
+        } else {
+            println!("not");
+            file_content
+        };
+
+        */
+        let new_content = if let Some(line) = file_content.lines().nth(index - 1) {
+            line.replacen(line, &format!("no;{}", new_todo), 1)
+        } else {
+            file_content
+        };
+        
+        fs::write(&self.file_path, new_content)?;
+        Ok(())
+    }
+
     pub fn get_todo(&self, index: usize) -> Option<String> {
         let content = fs::read_to_string(&self.file_path).ok()?;
         let mut lines = content.lines();

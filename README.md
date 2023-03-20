@@ -13,7 +13,7 @@
 - [x] Add tasks;
 - [x] Remove tasks;
 - [x] Read tasks;
-- [ ] Update tasks:
+- [x] Update tasks:
 - [x] Create categories;
 - [x] Clear categories;
 - [x] View categories;

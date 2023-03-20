@@ -13,6 +13,7 @@ mod utils;
 #[allow(dead_code)]
 mod terminal;
 
+#[allow(unreachable_code)]
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let commands: Vec<&String> = args.iter().filter(|x| !x.starts_with('-')).collect();
@@ -231,6 +232,46 @@ fn main() {
 
             term.warn("Exited 0");
             std::process::exit(0);
+        }
+
+        "e" | "edit" => {
+            check_arg_len(2);
+
+            let mut index = match arg1.unwrap().parse::<usize>() {
+                Ok(o) => o,
+                Err(_) => {
+                    term.err(&format!("Couldn't parse {} to integer.", arg1.unwrap().red()));
+                    term.dev("Error has been found; exit 1");
+                    std::process::exit(1);
+                },
+            };
+
+            let file_content = fs::read_to_string(todo.get_file_path()).unwrap();
+
+            if file_content.lines().count() == 0 {
+                term.err("File is empty");
+                term.dev("Error has been found; exit 1");
+                std::process::exit(1);
+            }
+
+            term.warn("Clamping index value to match the correct file size");
+            index = index.clamp(1, file_content.lines().count());
+
+            check_arg_len(3);
+
+            let new_todo = match commands.get(3) {
+                Some(s) => {
+                    s.to_string()
+                }
+
+                _ => {
+                    term.err(&format!("Too few arguments (<{index}), use help command"));
+                    term.dev("Error has been found; exit 1");
+                    std::process::exit(1);
+                }
+            };
+
+            todo.edit_todo(index, new_todo).unwrap();
         }
 
         "c" | "categories" => {

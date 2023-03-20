@@ -18,7 +18,7 @@ struct Flag {
     alias:       &'static str,
 }
 
-const COMMAND_LIST: [Command; 6] = [
+const COMMAND_LIST: [Command; 7] = [
     Command {
         name:        "help",
         description: "Show the help menu or help for a specific command",
@@ -28,7 +28,7 @@ const COMMAND_LIST: [Command; 6] = [
     Command {
         name:        "add",
         description: "Add a todo to the list (or create a new todo file)",
-        usage:       "<command name>",
+        usage:       "\"<todo>\"",
         alias:       "a",
     },
     Command {
@@ -42,6 +42,12 @@ const COMMAND_LIST: [Command; 6] = [
         description: "Toggle a todo on the list",
         usage:       "<todo index>",
         alias:       "t",
+    },
+    Command {
+        name:        "edit",
+        description: "Edit a todo on the list",
+        usage:       "<todo index> \"<new todo>\"",
+        alias:       "e",
     },
     Command {
         name:        "get",
@@ -84,7 +90,7 @@ const FLAG_LIST: [Flag; 4] = [
     },
 ];
 
-const EXAMPLES: [&str; 12] = [
+const EXAMPLES: [&str; 13] = [
     "toggle 2",
     "toggle 3 -V",
     "toggle 5",
@@ -97,6 +103,7 @@ const EXAMPLES: [&str; 12] = [
     "--o-done",
     "--verbose",
     "add \"Hello, world!\" -c=\"Test\"",
+    "edit 1 \"Hello, world!\"",
 ];
 
 pub fn help_menu(command_name: &str) {
