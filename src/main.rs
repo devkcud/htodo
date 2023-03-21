@@ -13,7 +13,6 @@ mod utils;
 #[allow(dead_code)]
 mod terminal;
 
-#[allow(unreachable_code)]
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let commands: Vec<&String> = args.iter().filter(|x| !x.starts_with('-')).collect();
@@ -259,19 +258,8 @@ fn main() {
 
             check_arg_len(3);
 
-            let new_todo = match commands.get(3) {
-                Some(s) => {
-                    s.to_string()
-                }
-
-                _ => {
-                    term.err(&format!("Too few arguments (<{index}), use help command"));
-                    term.dev("Error has been found; exit 1");
-                    std::process::exit(1);
-                }
-            };
-
-            todo.edit_todo(index, new_todo).unwrap();
+            term.log("Editing todo to {}");
+            todo.edit_todo(index, commands.get(3).unwrap().to_string()).unwrap();
         }
 
         "c" | "categories" => {
