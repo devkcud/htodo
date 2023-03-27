@@ -18,7 +18,7 @@ struct Flag {
     alias:       &'static str,
 }
 
-const COMMAND_LIST: [Command; 7] = [
+const COMMAND_LIST: [Command; 8] = [
     Command {
         name:        "help",
         description: "Show the help menu or help for a specific command",
@@ -58,6 +58,12 @@ const COMMAND_LIST: [Command; 7] = [
     Command {
         name:        "clear",
         description: "Clear todo the list",
+        usage:       "",
+        alias:       "",
+    },
+    Command {
+        name:        "categories",
+        description: "Show all categories",
         usage:       "",
         alias:       "c",
     },
