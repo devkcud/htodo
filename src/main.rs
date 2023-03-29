@@ -1,5 +1,5 @@
 use std::fs;
-use colored::Colorize;
+use colored::{Colorize, control};
 
 #[allow(dead_code)]
 mod todomanager;
@@ -14,12 +14,17 @@ mod utils;
 mod terminal;
 
 fn main() {
+
     let args: Vec<String> = std::env::args().collect();
     let commands: Vec<&String> = args.iter().filter(|x| !x.starts_with('-')).collect();
     let flags = args.iter().filter(|x| x.starts_with('-')).collect::<Vec<&String>>();
 
     let show_only_done = flags.iter().find(|a| a.trim() == "-y" || a.trim() == "--o-done").is_some();
     let show_only_todo = flags.iter().find(|a| a.trim() == "-n" || a.trim() == "--o-todo").is_some();
+
+    if flags.iter().find(|a| a.trim() == "-nc" || a.trim() == "--no-color").is_some() {
+        control::set_override(false);
+    }
 
     let term = terminal::Terminal::new(flags.iter().find(|a| a.trim() == "-V" || a.trim() == "--verbose").is_some());
     term.warn("Verbose mode active (-V || --verbose)");
