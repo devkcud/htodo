@@ -69,7 +69,7 @@ const COMMAND_LIST: [Command; 8] = [
     },
 ];
 
-const FLAG_LIST: [Flag; 4] = [
+const FLAG_LIST: [Flag; 5] = [
     Flag {
         name:        "o-done",
         description: "Only show done tasks",
@@ -94,11 +94,19 @@ const FLAG_LIST: [Flag; 4] = [
         usage:       "\"<category-name>\"",
         alias:       "c",
     },
+
+    Flag {
+        name:        "no-color",
+        description: "Disables colored output",
+        usage:       "",
+        alias:       "nc",
+    },
 ];
 
-const EXAMPLES: [&str; 13] = [
+const EXAMPLES: [&str; 15] = [
     "toggle 2",
     "toggle 3 -V",
+    "toggle 1 -V -nc",
     "toggle 5",
     "add \"Hello, world!\"",
     "remove 1",
@@ -109,6 +117,7 @@ const EXAMPLES: [&str; 13] = [
     "--o-done",
     "--verbose",
     "add \"Hello, world!\" -c=\"Test\"",
+    "add \"Hello, world!\" -nc -c=\"Test\"",
     "edit 1 \"Hello, world!\"",
 ];
 
