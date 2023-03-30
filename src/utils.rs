@@ -3,7 +3,7 @@ use colored::Colorize;
 use prettytable::{Table, format, row};
 use std::ops::Sub;
 
-pub fn show_todo_list(todos: &str, term: &Terminal, category: &str, show_only_done: bool, show_only_todo: bool) {
+pub fn show_todo_list(todos: &str, term: &Terminal, category: &str, show_only_done: bool, show_only_todo: bool, simple: bool) {
     if todos.lines().count() == 0 {
         term.err("Nothing to show. File is empty");
 
@@ -11,12 +11,14 @@ pub fn show_todo_list(todos: &str, term: &Terminal, category: &str, show_only_do
         std::process::exit(0);
     }
 
-    println!("{} {}\n", "SELECTED CATEGORY:".yellow().bold(), category.to_string());
-
     let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+    table.set_format(*format::consts::FORMAT_CLEAN);
 
-    table.set_titles(row!["", "TASK".yellow().bold(), "STATUS".yellow().bold()]);
+    if !simple {
+        println!("{} {}\n", "SELECTED CATEGORY:".yellow().bold(), category.to_string());
+        table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+        table.set_titles(row!["", "TASK".yellow().bold(), "STATUS".yellow().bold()]);
+    }
 
     let mut quantity_done = 0;
 
@@ -43,6 +45,8 @@ pub fn show_todo_list(todos: &str, term: &Terminal, category: &str, show_only_do
     };
 
     table.printstd();
+
+    if simple { return; }
 
     let total_shown = table.to_string().lines().count().sub(2);
 

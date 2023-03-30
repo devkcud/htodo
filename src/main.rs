@@ -26,6 +26,8 @@ fn main() {
         control::set_override(false);
     }
 
+    let simple = flags.iter().find(|a| a.trim() == "-s" || a.trim() == "--simple").is_some();
+
     let term = terminal::Terminal::new(flags.iter().find(|a| a.trim() == "-V" || a.trim() == "--verbose").is_some());
     term.warn("Verbose mode active (-V || --verbose)");
 
@@ -77,7 +79,7 @@ fn main() {
     if commands.len() == 1 {
         let todos = fs::read_to_string(todo.get_file_path()).unwrap();
 
-        utils::show_todo_list(&todos, &term, &category, show_only_done, show_only_todo);
+        utils::show_todo_list(&todos, &term, &category, show_only_done, show_only_todo, simple);
 
         term.warn("Exited 0");
         std::process::exit(0);
@@ -289,7 +291,7 @@ fn main() {
         }
     }
 
-    utils::show_todo_list(&fs::read_to_string(todo.get_file_path()).unwrap(), &term, &category, show_only_done, show_only_todo);
+    utils::show_todo_list(&fs::read_to_string(todo.get_file_path()).unwrap(), &term, &category, show_only_done, show_only_todo, simple);
 
     term.warn("Exited 0");
 }

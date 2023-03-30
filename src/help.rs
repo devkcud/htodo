@@ -69,7 +69,7 @@ const COMMAND_LIST: [Command; 8] = [
     },
 ];
 
-const FLAG_LIST: [Flag; 5] = [
+const FLAG_LIST: [Flag; 6] = [
     Flag {
         name:        "o-done",
         description: "Only show done tasks",
@@ -94,12 +94,17 @@ const FLAG_LIST: [Flag; 5] = [
         usage:       "\"<category-name>\"",
         alias:       "c",
     },
-
     Flag {
         name:        "no-color",
         description: "Disables colored output",
         usage:       "",
         alias:       "nc",
+    },
+    Flag {
+        name:        "simple",
+        description: "Only show relevant information",
+        usage:       "",
+        alias:       "s",
     },
 ];
 
