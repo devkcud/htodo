@@ -24,9 +24,11 @@ fn main() {
 
     if flags.iter().find(|a| a.trim() == "-nc" || a.trim() == "--no-color").is_some() {
         control::set_override(false);
+        term.warn("No color mode active (-nc || --no-color)");
     }
 
     let simple = flags.iter().find(|a| a.trim() == "-s" || a.trim() == "--simple").is_some();
+    term.warn("Simple mode active (-s || --simple)");
 
     let term = terminal::Terminal::new(flags.iter().find(|a| a.trim() == "-V" || a.trim() == "--verbose").is_some());
     term.warn("Verbose mode active (-V || --verbose)");
