@@ -14,7 +14,6 @@ mod utils;
 mod terminal;
 
 fn main() {
-
     let args: Vec<String> = std::env::args().collect();
     let commands: Vec<&String> = args.iter().filter(|x| !x.starts_with('-')).collect();
     let flags = args.iter().filter(|x| x.starts_with('-')).collect::<Vec<&String>>();
